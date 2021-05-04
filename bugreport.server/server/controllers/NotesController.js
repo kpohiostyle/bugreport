@@ -16,7 +16,7 @@ export class NotesController extends BaseController {
     try {
       // NOTE NEVER TRUST THE CLIENT TO ADD THE CREATOR ID
       req.body.creatorId = req.userInfo.id
-      const data = await notesService.delteNote(req.body)
+      const data = await notesService.createNote(req.body)
       res.send(data)
     } catch (error) {
       next(error)

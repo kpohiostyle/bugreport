@@ -8,10 +8,10 @@ export class BugsController extends BaseController {
     super('api/bugs')
     this.router
     // NOTE: Beyond this point all routes require Authorization tokens (the user must be logged in)
-      .use(Auth0Provider.getAuthorizedUserInfo)
       .get('', this.getAllBugs)
       .get('/:id', this.getBugById)
       .get('/:id/notes', this.getNotes)
+      .use(Auth0Provider.getAuthorizedUserInfo)
       .post('', this.createBug)
       .put('/:id', this.editBug)
       .delete('/:id', this.deleteBug)
@@ -19,7 +19,7 @@ export class BugsController extends BaseController {
 
   async getAllBugs(req, res, next) {
     try {
-      const data = await bugsService.getAllBugs({ creatorId: req.userInfo.id })
+      const data = await bugsService.getAllBugs(req.query)
       return res.send(data)
     } catch (error) {
       next(error)
@@ -37,7 +37,7 @@ export class BugsController extends BaseController {
 
   async getNotes(req, res, next) {
     try {
-      const data = await notesService.getNotes({ bugId: req.params.id })
+      const data = await notesService.getNotes({ bug: req.params.id })
       return res.send(data)
     } catch (error) {
       next(error)
@@ -48,7 +48,7 @@ export class BugsController extends BaseController {
     try {
       // NOTE NEVER TRUST THE CLIENT TO ADD THE CREATOR ID
       req.body.creatorId = req.userInfo.id
-      const data = bugsService.createBug(req.body)
+      const data = await bugsService.createBug(req.body)
       res.send(data)
     } catch (error) {
       next(error)
@@ -66,6 +66,9 @@ export class BugsController extends BaseController {
 
   async editBug(req, res, next) {
     try {
+      req.body.creatorId = req.userInfo.id
+      req.body.id = req.params.id
+      delete req.body.closed
       const data = await bugsService.editBug(req.body)
       return res.send(data)
     } catch (error) {

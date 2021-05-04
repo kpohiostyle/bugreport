@@ -1,23 +1,31 @@
 <template>
-  <div class="container-fluid">
+  <div class=" background container-fluid">
     <div class="home flex-grow-1 d-flex flex-column">
-      <div class="row">
+      <div class="row" v-if="state.bugs">
         <div class="col-md-6">
-          <div class="d-flex flex-direction inline ml-2 mt-3">
+          <div class="d-flex flex-direction inline ml-2 my-3">
             <h1 class="mr-2">
               Current Bugs
             </h1>
-            <button title="Open Create Bug Form" type="button" class="btn" data-toggle="modal" data-target="#exampleModal">
+            <button title="Open Create Bug Form"
+                    type="button"
+                    class="btn"
+                    data-toggle="modal"
+                    data-target="#new-bug-form"
+                    v-if="state.user.isAuthenticated"
+            >
               <i class="fas fa-plus" aria-hidden="true">Bug</i>
             </button>
           </div>
         </div>
+        <div class="col-6 d-flex flex-direction align-items-end justify-content-end">
+          <input type="checkbox" id="hideBugs" @click="hideBugs">
+          <small>hide closed</small>
+        </div>
       </div>
 
-      <div class="row">
-        <div class="col">
-          <BugComponent v-for="bug in state.bugs" :key="bug.id" :bug="bug" />
-        </div>
+      <div class="row d-flex flex direction justify-content-center">
+        <BugComponent v-for="bug in state.bugs" :key="bug.id" :bug="bug" />
       </div>
     </div>
   </div>
@@ -58,17 +66,16 @@
                      required
               >
             </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                Close
+              </button>
+
+              <button type="submit" class="btn btn-primary">
+                Add
+              </button>
+            </div>
           </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
-            Close
-          </button>
-          <router-link :to="{name: 'BugDetails', params:{id: bug.id}}">
-            <button type="submit" class="btn btn-primary">
-              Add
-            </button>
-          </router-link>
         </div>
       </div>
     </div>
@@ -76,14 +83,25 @@
 </template>
 
 <script>
-import { reactive } from 'vue'
+import { computed, onMounted, reactive } from 'vue'
 import { bugsService } from '../services/BugsService'
+import { AppState } from '../AppState'
+import Notification from '../utils/Notification'
 import $ from 'jquery'
 export default {
   name: 'Home',
   setup() {
     const state = reactive({
-      newBug: {}
+      newBug: {},
+      user: computed(() => AppState.user),
+      bugs: computed(() => AppState.bugs)
+    })
+    onMounted(async() => {
+      try {
+        await bugsService.getBugs()
+      } catch (error) {
+        Notification.toast('Error: ' + error, 'error')
+      }
     })
     return {
       state,
@@ -91,15 +109,23 @@ export default {
         try {
           await bugsService.createBug(state.newBug)
           state.newBug = {}
-          $('new-bug-form').modal('hide')
-          Notification.toast('Added Bugt', 'success')
+          $('#new-bug-form').modal('hide')
+          Notification.toast('Added Bug', 'success')
         } catch (error) {
           Notification.toast('Error:' + error, 'error')
+        }
+      },
+      async hideBugs() {
+        try {
+          await bugsService.hideBugs()
+        } catch (error) {
+          Notification.toast('Error: ' + error, ' error')
         }
       }
     }
   }
 }
+
 </script>
 
 <style scoped lang="scss">
@@ -110,6 +136,9 @@ export default {
     height: 200px;
     width: 200px;
   }
+}
+.background{
+  background-color: rgb(170, 170, 170);
 }
 .btn{
   color: aquamarine;

@@ -3,7 +3,9 @@ import { BadRequest } from '../utils/Errors'
 
 class NotesService {
   async getNotes(query) {
-    return await dbContext.Notes.find(query)
+    const data = await dbContext.Notes.find(query)
+      .populate('creator', 'name picture')
+    return data
   }
 
   async createNote(body) {

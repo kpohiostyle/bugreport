@@ -1,13 +1,13 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
+  <nav class="navbar navbar-expand-lg bg-custom">
     <router-link class="navbar-brand d-flex" :to="{ name: 'Home' }">
-      <div class="d-flex align-items-center flex-direction inline">
+      <div class="d-flex align-items-center flex-direction inline bg-custom-text">
         <img
           alt="logo"
           src="../assets/img/spider.png"
           height="45"
         />
-        <h5 class="ml-1">
+        <h5 class="ml-1 raised-hover">
           Log
         </h5>
       </div>
@@ -117,9 +117,16 @@ a:hover {
   text-transform: uppercase;
 }
 .nav-item .nav-link.router-link-exact-active{
-  color: var(--primary);
+  color: rgb(170, 170, 170);
 }
 .bg-custom{
   background-color:aquamarine;
+}
+.bg-custom-text{
+  color: rgb(170, 170, 170) !important;
+}
+.raised-hover:hover{
+  color:gray;
+
 }
 </style>

@@ -1,39 +1,51 @@
 <template>
-  <div class="card-custom col-12 shadow">
+  <div class="card-custom col-12 col-md-11 shadow mt-1 bg-light">
     <div class="border-custom d-flex flex-direction justify-content-between inline">
       <router-link :to="{name: 'BugDetails', params: {id: bug.id}}">
         <p class="py-3 pl-2">
-          title
+          {{ bug.title }}
         </p>
       </router-link>
       <p class="py-3 pl-2">
-        Reported By
+        <img class="rounded-circle small-image" :src="bug.creator.picture" alt="Creator Picture">
+        {{ bug.creator.name }}
+      </p>
+      <p class="py-3 pl-2 text-danger" v-if="bug.closed===true">
+        Closed
+      </p>
+      <p class="py-3 pl-2 text-success" v-if="bug.closed===false">
+        Open
       </p>
       <p class="py-3 pl-2">
-        Status
-      </p>
-      <p class="py-3 pl-2">
-        Last Modified
+        {{ new Date (bug.updatedAt).toLocaleString('en', 'time') }}
       </p>
     </div>
   </div>
 </template>
 <script>
-
 export default {
   name: 'BugComponent',
   props: {
-    list: {
+    bug: {
       type: Object,
       required: true
     }
   },
   setup() {
-    return {}
+    return {
+      time: {
+        year: '2-digit',
+        month: '2-digit',
+        day: '2-digit'
+      }
+    }
   },
   components: {}
 }
 </script>
-<style lang="">
-
+<style scoped>
+.small-image{
+  height: 50px;
+  width: 50px;
+}
 </style>
